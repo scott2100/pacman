@@ -15,6 +15,7 @@ class PacManPanel extends JPanel implements Runnable, KeyListener {
 	PacMan pacMan = new PacMan();
 
 	public PacManPanel() {
+		pacMan.setMaze(pacMaze);
 		this.setPreferredSize(new Dimension(height, width));
 		this.setFocusable(true);
 		setDoubleBuffered(true);
@@ -50,9 +51,7 @@ class PacManPanel extends JPanel implements Runnable, KeyListener {
 	public void run() {
 		while (true) {
 			repaint();
-			if (pacMaze.canMoveToNextTile(pacMan.getPacManX(), pacMan.getPacManY(), pacMan.getDirection())) {
-				pacMan.move();
-			}
+			pacMan.move();
 			try {
 				Thread.sleep(20);
 			} catch (Exception e) {
@@ -69,19 +68,19 @@ class PacManPanel extends JPanel implements Runnable, KeyListener {
 		keys[e.getKeyCode()] = true;
 
 		if (key == KeyEvent.VK_LEFT) {
-			pacMan.setDirection("left");
+			pacMan.setQueuedDirection(Direction.LEFT);
 		}
 
 		if (key == KeyEvent.VK_RIGHT) {
-			pacMan.setDirection("right");
+			pacMan.setQueuedDirection(Direction.RIGHT);
 		}
 
 		if (key == KeyEvent.VK_UP) {
-			pacMan.setDirection("up");
+			pacMan.setQueuedDirection(Direction.UP);
 		}
 
 		if (key == KeyEvent.VK_DOWN) {
-			pacMan.setDirection("down");
+			pacMan.setQueuedDirection(Direction.DOWN);
 		}
 	}
 

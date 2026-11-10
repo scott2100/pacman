@@ -28,39 +28,6 @@ class Maze {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	};
 
-	public Boolean canMoveToNextTile(int x, int y, String direction) {
-		x = x / 20;
-		y = y / 20;
-
-		if (direction == "up") {
-			System.out.println("up: " + y + " " + x);
-			if (this.getMaze()[y - 1][x] == 0) {
-				return true;
-			}
-		}
-		if (direction == "right") {
-			System.out.println("right: " + y + " " + x);
-			System.out.println("right: " + (y + 1) + " " + x);
-			System.out.println(this.getMaze()[y + 1][x]);
-			if (this.getMaze()[y][x + 1] == 0) {
-				return true;
-			}
-		}
-		if (direction == "down") {
-			System.out.println("down: " + x + " " + y);
-			if (this.getMaze()[y + 1][x] == 0) {
-				return true;
-			}
-		}
-		if (direction == "left") {
-			System.out.println("left: " + x + " " + y);
-			if (this.getMaze()[y][x - 1] == 0) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public void setHeight(int height) {
 		this.height = height;
 	}
