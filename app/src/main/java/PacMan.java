@@ -50,6 +50,12 @@ class PacMan {
 
 	public void move() {
 
+		int dx = direction.getDx();
+		int dy = direction.getDy();
+
+		this.setPacManY(this.getPacManY() + dy);
+		this.setPacManX(this.getPacManX() + dx);
+
 		if (this.getPacManX() % 20 == 0 && this.getPacManY() % 20 == 0) {
 			int qdx = queuedDirection.getDx();
 			int qdy = queuedDirection.getDy();
@@ -57,18 +63,12 @@ class PacMan {
 			if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY())
 					+ qdy][getAdjustedCoordinate(this.getPacManX()) + qdx] != 1)) {
 				this.direction = this.queuedDirection;
-			} else {
-				this.queuedDirection = this.direction;
 			}
-		}
 
-		int dx = direction.getDx();
-		int dy = direction.getDy();
-
-		if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY()) + dy][getAdjustedCoordinate(this.getPacManX())
-				+ dx] != 1)) {
-			this.setPacManY(this.getPacManY() + dy);
-			this.setPacManX(this.getPacManX() + dx);
+			if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY())
+					+ dy][getAdjustedCoordinate(this.getPacManX()) + dx] == 1)) {
+				this.direction = Direction.STOPPED;
+			}
 		}
 	}
 }

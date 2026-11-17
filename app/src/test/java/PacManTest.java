@@ -2,7 +2,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class MazeTest {
+public class PacManTest {
 
     public int[][] maze = {
             { 1, 1, 1, 1, 1 },
@@ -24,8 +24,8 @@ public class MazeTest {
             pacman.move();
         }
 
-        assertEquals(pacman.getPacManX(), 20);
-        assertEquals(pacman.getPacManY(), 20);
+        assertEquals(20, pacman.getPacManX());
+        assertEquals(20, pacman.getPacManY());
     }
 
 }
