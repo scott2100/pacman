@@ -1,6 +1,3 @@
-import java.awt.*;
-import javax.swing.*;
-
 class Maze {
 
 	private static int height = 400;

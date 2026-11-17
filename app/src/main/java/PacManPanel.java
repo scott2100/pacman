@@ -12,7 +12,7 @@ class PacManPanel extends JPanel implements Runnable, KeyListener {
 	public static int height = 400;
 	public static int width = 400;
 	Maze pacMaze = new Maze();
-	PacMan pacMan = new PacMan();
+	PacMan pacMan = new PacMan(20, 20);
 
 	public PacManPanel() {
 		pacMan.setMaze(pacMaze);

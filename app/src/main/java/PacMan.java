@@ -1,13 +1,16 @@
 class PacMan {
 
-	private int pacmanX = 20;
-	private int pacmanY = 20;
+	private int pacmanX;
+	private int pacmanY;
 	private int speed = 2;
 	private Direction direction = Direction.STOPPED;
 	private Direction queuedDirection = Direction.STOPPED;
 	private Maze maze;
-	private int row;
-	private int col;
+
+	public PacMan(int x, int y) {
+		this.pacmanX = x;
+		this.pacmanY = y;
+	}
 
 	public int getSpeed() {
 		return this.speed;
@@ -45,26 +48,25 @@ class PacMan {
 		return coordinate / 20;
 	}
 
-
-
 	public void move() {
-
-		row = getAdjustedCoordinate(this.getPacManY());
-		col = getAdjustedCoordinate(this.getPacManX());
 
 		if (this.getPacManX() % 20 == 0 && this.getPacManY() % 20 == 0) {
 			int qdx = queuedDirection.getDx();
 			int qdy = queuedDirection.getDy();
 
-			if ((this.maze.getMaze()[row + qdy][col + qdx] != 1)) {
+			if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY())
+					+ qdy][getAdjustedCoordinate(this.getPacManX()) + qdx] != 1)) {
 				this.direction = this.queuedDirection;
+			} else {
+				this.queuedDirection = this.direction;
 			}
 		}
 
 		int dx = direction.getDx();
 		int dy = direction.getDy();
 
-		if ((this.maze.getMaze()[row + dy][col + dx] != 1)) {
+		if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY()) + dy][getAdjustedCoordinate(this.getPacManX())
+				+ dx] != 1)) {
 			this.setPacManY(this.getPacManY() + dy);
 			this.setPacManX(this.getPacManX() + dx);
 		}
