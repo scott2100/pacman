@@ -16,17 +16,12 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    // This dependency is used by the application.
-    implementation(libs.guava)
-}
-
 testing {
     suites {
         // Configure the built-in test suite
-        val test = named<JvmTestSuite>("test") {
-            // Use JUnit4 test framework
-            useJUnit("4.13.2")
+        val test by getting(JvmTestSuite::class) {
+            // Use JUnit Jupiter (JUnit 5) test framework
+            useJUnitJupiter("5.14.4")
         }
     }
 }

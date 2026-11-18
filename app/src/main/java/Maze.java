@@ -1,8 +1,8 @@
 class Maze {
 
-	private static int height = 400;
-	private static int width = 400;
-	private static int[][] maze = {
+	private int height = 400;
+	private int width = 400;
+	private int[][] maze = {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 			{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 },

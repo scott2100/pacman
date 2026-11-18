@@ -1,5 +1,4 @@
 class PacMan {
-
 	private int pacmanX;
 	private int pacmanY;
 	private int speed = 2;
