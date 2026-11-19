@@ -1,3 +1,5 @@
+package io.github.scott2100.pacman;
+
 import javax.swing.JFrame;
 import java.awt.Color;
 

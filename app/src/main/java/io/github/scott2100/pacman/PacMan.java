@@ -1,14 +1,19 @@
+package io.github.scott2100.pacman;
+
 class PacMan {
 	private int pacmanX;
 	private int pacmanY;
 	private int speed = 2;
+	private int size = 20;
 	private Direction direction = Direction.STOPPED;
 	private Direction queuedDirection = Direction.STOPPED;
 	private Maze maze;
 
-	public PacMan(int x, int y) {
+	public PacMan(int x, int y, int size, Maze maze) {
 		this.pacmanX = x;
 		this.pacmanY = y;
+		this.size = 20;
+		this.maze = maze;
 	}
 
 	public int getSpeed() {
@@ -39,35 +44,32 @@ class PacMan {
 		this.queuedDirection = queuedDirection;
 	}
 
-	public void setMaze(Maze maze) {
-		this.maze = maze;
+	public int getSize() {
+		return size;
 	}
 
 	public int getAdjustedCoordinate(int coordinate) {
-		return coordinate / 20;
+		return coordinate / this.getSize();
 	}
 
 	public void move() {
+		System.out.println("move. " + Thread.currentThread().getName());
 
-		int dx = direction.getDx();
-		int dy = direction.getDy();
-
-		this.setPacManY(this.getPacManY() + dy);
-		this.setPacManX(this.getPacManX() + dx);
-
-		if (this.getPacManX() % 20 == 0 && this.getPacManY() % 20 == 0) {
-			int qdx = queuedDirection.getDx();
-			int qdy = queuedDirection.getDy();
+		if (this.getPacManX() % this.getSize() == 0 && this.getPacManY() % this.getSize() == 0) {
 
 			if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY())
-					+ qdy][getAdjustedCoordinate(this.getPacManX()) + qdx] != 1)) {
+					+ queuedDirection.getDy()][getAdjustedCoordinate(this.getPacManX())
+							+ queuedDirection.getDx()] != 1)) {
 				this.direction = this.queuedDirection;
 			}
 
 			if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY())
-					+ dy][getAdjustedCoordinate(this.getPacManX()) + dx] == 1)) {
+					+ direction.getDy()][getAdjustedCoordinate(this.getPacManX()) + direction.getDx()] == 1)) {
 				this.direction = Direction.STOPPED;
 			}
 		}
+
+		this.setPacManY(this.getPacManY() + direction.getDy());
+		this.setPacManX(this.getPacManX() + direction.getDx());
 	}
 }

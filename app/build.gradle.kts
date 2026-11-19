@@ -35,5 +35,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass.set("PacManFrame")
+    mainClass.set("io.github.scott2100.pacman.PacManFrame")
 }
