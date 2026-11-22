@@ -11,7 +11,31 @@ class PacManPanel extends JPanel implements Runnable, KeyListener {
 
 	public static int height = 400;
 	public static int width = 400;
-	Maze pacMaze = new Maze();
+
+	private static int[][] grid = {
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 },
+			{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
+			{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
+			{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
+			{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	};
+
+	Maze pacMaze = new Maze(grid);
 	PacMan pacMan = new PacMan(20, 20, 20, pacMaze);
 
 	public PacManPanel() {
@@ -30,14 +54,14 @@ class PacManPanel extends JPanel implements Runnable, KeyListener {
 		g2.setColor(Color.BLACK);
 		g2.fillRect(0, 0, height, width);
 
-		for (int y = 0; y < pacMaze.getMaze().length; y++) {
-			for (int x = 0; x < pacMaze.getMaze()[y].length; x++) {
-				if (pacMaze.getMaze()[y][x] == 1) {
+		for (int row = 0; row < pacMaze.height(); row++) {
+			for (int col = 0; col < pacMaze.width(); col++) {
+				if (pacMaze.isWall(row, col)) {
 					g2.setColor(Color.BLUE);
-					g2.drawRect(x * pacMan.getSize(), y * pacMan.getSize(), pacMan.getSize(), pacMan.getSize());
-				} else if (pacMaze.getMaze()[y][x] == 2) {
+					g2.drawRect(col * pacMan.getSize(), row * pacMan.getSize(), pacMan.getSize(), pacMan.getSize());
+				} else if (pacMaze.isPill(row, col)) {
 					g2.setColor(Color.ORANGE);
-					g2.fillOval(((x * pacMan.getSize()) + 7), ((y * pacMan.getSize()) + 7), 5, 5);
+					g2.fillOval(((col * pacMan.getSize()) + 7), ((row * pacMan.getSize()) + 7), 5, 5);
 				}
 			}
 		}

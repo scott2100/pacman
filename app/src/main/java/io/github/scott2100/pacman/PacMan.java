@@ -9,6 +9,26 @@ class PacMan {
 	private Direction queuedDirection = Direction.STOPPED;
 	private Maze maze;
 
+	public void move() {
+		System.out.println("move. " + Thread.currentThread().getName());
+
+		if (this.getPacManX() % this.getSize() == 0 && this.getPacManY() % this.getSize() == 0) {
+
+			if (!this.maze.isWall((getAdjustedCoordinate(this.getPacManY()) + queuedDirection.getDy()),
+					(getAdjustedCoordinate(this.getPacManX()) + queuedDirection.getDx()))) {
+				this.direction = this.queuedDirection;
+			}
+
+			if (this.maze.isWall((getAdjustedCoordinate(this.getPacManY()) + direction.getDy()),
+					(getAdjustedCoordinate(this.getPacManX()) + direction.getDx()))) {
+				this.direction = Direction.STOPPED;
+			}
+		}
+
+		this.setPacManY(this.getPacManY() + direction.getDy());
+		this.setPacManX(this.getPacManX() + direction.getDx());
+	}
+
 	public PacMan(int x, int y, int size, Maze maze) {
 		this.pacmanX = x;
 		this.pacmanY = y;
@@ -50,26 +70,5 @@ class PacMan {
 
 	public int getAdjustedCoordinate(int coordinate) {
 		return coordinate / this.getSize();
-	}
-
-	public void move() {
-		System.out.println("move. " + Thread.currentThread().getName());
-
-		if (this.getPacManX() % this.getSize() == 0 && this.getPacManY() % this.getSize() == 0) {
-
-			if ((this.maze.grid[getAdjustedCoordinate(this.getPacManY())
-					+ queuedDirection.getDy()][getAdjustedCoordinate(this.getPacManX())
-							+ queuedDirection.getDx()] != 1)) {
-				this.direction = this.queuedDirection;
-			}
-
-			if ((this.maze.grid()[getAdjustedCoordinate(this.getPacManY())
-					+ direction.getDy()][getAdjustedCoordinate(this.getPacManX()) + direction.getDx()] == 1)) {
-				this.direction = Direction.STOPPED;
-			}
-		}
-
-		this.setPacManY(this.getPacManY() + direction.getDy());
-		this.setPacManX(this.getPacManX() + direction.getDx());
 	}
 }
