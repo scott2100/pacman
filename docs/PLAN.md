@@ -1,6 +1,6 @@
 # Pac-Man — Modernization Plan
 
-**Status:** in progress — Phase 0 nearly done, Phases 1–3 partly done (reviewed against the code 2026-11-18)
+**Status:** in progress — Phase 0 done once the staged work is committed; Phases 1–3 partly done (reviewed against the code 2026-11-20)
 **Scope:** the Swing Pac-Man in `pacman/`
 **Goal:** turn a working maze-walker into a small, clean, tested, recognizable Pac-Man — **without a rewrite**.
 
@@ -13,10 +13,10 @@ yellow square around it. The 180 lines of four-way copy-paste movement are now o
 `move()` driven by a `Direction` enum, the project has Gradle, git, a package, a real README and
 its first JUnit 5 test, and the corner stall is fixed.
 
-What's left is the "second layer" of the foundation: a build that's currently broken by the
-package move, a couple of movement gaps (reversal, speed), a game loop that shares state across
-threads unsafely, rendering that still allocates per frame, and no game layer (pellets are drawn
-but never eaten; no score, win or lose).
+What's left is the "second layer" of the foundation: a test that passes for the wrong reason, a
+couple of movement gaps (reversal, speed), a game loop that shares state across threads unsafely,
+rendering that still allocates per frame, and no game layer (pellets are drawn but never eaten;
+no score, win or lose).
 
 The order stays the same: fix the foundation, then add gameplay, then polish.
 
@@ -28,7 +28,7 @@ The order stays the same: fix the foundation, then add gameplay, then polish.
 - A single, general movement routine instead of four duplicated blocks. ✅
 - Simulation decoupled from rendering and from frame rate.
 - Game logic free of `java.awt` so it can be tested headless. ✅ (keep it that way)
-- A reproducible build and a repo that looks like a real project. (nearly — build broken in working tree)
+- A reproducible build and a repo that looks like a real project. ✅ (once the staged work is committed)
 - A playable loop: eat pellets → score → win; ghosts → lose.
 - No framework migration. Swing stays.
 
@@ -45,22 +45,25 @@ The order stays the same: fix the foundation, then add gameplay, then polish.
 
 ## 4. Where the project is today
 
-Repo: `pacman/` (remote `github.com/scott2100/pacman`), on branch `feature/testin_movement_refactor`.
-Last commit `0898748` (2026-11-17, README + build + movement fixes). **Uncommitted:** sources moved
-into package `io.github.scott2100.pacman`, `PLAN.md` moved to `docs/`, `.idea` added to `.gitignore`,
-`guava` removed from the version catalog, `PacMan` constructor now takes the maze.
+Repo: `pacman/` (remote `github.com/scott2100/pacman`), on branch `feature/testin_movement_refactor`, in sync with origin.
+Last commit `ad9a546` (2026-11-18): package move, plan moved to `docs/`, `.idea` untracked, `.DS_Store`
+ignored, guava removed, fully qualified `mainClass`, maze via constructor. **Note:** that commit's test
+still used the old constructors, so `ad9a546` itself doesn't compile its tests (a red commit — see principle 8).
+
+**Staged:** `PacMan` now uses its `size` argument; `PacManTest` updated to the new constructors.
+**Unstaged:** `Maze` height/width setters and getters removed.
 
 | File | Role | State |
 |---|---|---|
-| `app/src/main/java/io/github/scott2100/pacman/PacMan.java` | Entity + movement | 79 lines; maze via constructor; corner stall fixed; `size` arg ignored; debug `println` in `move()` |
+| `app/src/main/java/io/github/scott2100/pacman/PacMan.java` | Entity + movement | 75 lines; maze + size via constructor ✅; corner stall fixed; `speed` unused; debug `println` in `move()` |
 | `…/Direction.java` | Value type | Enum with `dx`/`dy` and `STOPPED` — good |
-| `…/Maze.java` | Tile data | Hardcoded 20×20; unused `height`/`width` (now with setters); `getMaze()`/`setMaze()` expose the array |
-| `…/PacManPanel.java` | Render + input + loop | Raw `Thread` from the constructor; new image every frame; `public static` sizes; interrupt handled properly now |
+| `…/Maze.java` | Tile data | Hardcoded 20×20 default grid; constructor takes `height`/`width` and **ignores them**; `getMaze()`/`setMaze()` expose the array |
+| `…/PacManPanel.java` | Render + input + loop | Raw `Thread` from the constructor; new image every frame; `public static` sizes; debug prints |
 | `…/PacManFrame.java` | Bootstrap | Not on the EDT; no title; `setVisible` before setup |
-| `app/src/test/java/PacManTest.java` | Tests | **Does not compile**: still in the default package and calls the old constructors |
-| `app/build.gradle.kts` | Build | **`mainClass` still `"PacManFrame"`** — needs the fully qualified name |
-| `README.md` | Docs | Good: status, requirements, run/test, controls, structure, limitations, roadmap. Structure section and "corner pause" limitation now out of date; no screenshot yet |
-| `docs/PLAN.md` | This file | In the repo now ✅ (keep in sync with the project copy) |
+| `app/src/test/java/io/github/scott2100/pacman/PacManTest.java` | Tests | In the right package ✅, compiles ✅ — but **never uses its own maze** (see defects) |
+| `app/build.gradle.kts` | Build | `mainClass` fully qualified ✅ |
+| `README.md` | Docs | Good. Structure section (no package path) and "corner pause" limitation are out of date; no screenshot yet |
+| `docs/PLAN.md` | This file | In the repo ✅ (keep in sync with the project copy) |
 
 ---
 
@@ -73,29 +76,32 @@ into package `io.github.scott2100.pacman`, `PLAN.md` moved to `docs/`, `.idea` a
 - ~~Four duplicated direction blocks~~ — one routine.
 - ~~`PacmanFrame.java` / `PacManFrame` capitalization~~.
 - ~~`.class` files committed~~ — `.gitignore` covers `*.class` and `build`.
-- ~~One-tick stall at every L-corner~~ — `move()` now reads `direction` *after* the queued turn is applied. (Verified 2026-11-18: at the corner, Pac-Man moves up on the very next tick.) **No regression test yet.**
-- ~~`catch (Exception e) { // }`~~ — now catches `InterruptedException`, restores the flag and exits.
-- ~~Hidden `setMaze()` dependency~~ — maze is a constructor argument (but `setMaze` still exists).
-- ~~Unused `guava` dependency~~ (uncommitted).
+- ~~One-tick stall at every L-corner~~ — `move()` reads `direction` *after* the queued turn is applied. **No regression test yet.**
+- ~~`catch (Exception e) { // }`~~ — catches `InterruptedException`, restores the flag and exits.
+- ~~Hidden `setMaze()` dependency on `PacMan`~~ — maze is a constructor argument.
+- ~~Unused `guava` dependency~~.
+- ~~Tests don't compile after the package move~~ — test moved into the package and updated (staged).
+- ~~`mainClass` not fully qualified~~.
+- ~~`PacMan` ignores its `size` argument~~ (staged).
+- ~~`.idea` tracked; `.DS_Store` not ignored~~.
+- ~~Dead `height`/`width` setters on `Maze`~~ (unstaged) — but the fields and constructor params are still dead.
 
 ### Still open
 | Severity | Symptom | Where |
 |---|---|---|
-| **Blocker** | **Tests don't compile.** `PacManTest` is in the default package, so it can't see the package-private classes in `io.github.scott2100.pacman` (and Java can't import from the default package at all). It also calls `new Maze()` and `new PacMan(60, 20)`, which no longer exist. | `app/src/test/java/PacManTest.java` |
-| **Blocker** | **`./gradlew run` will fail** with `ClassNotFoundException`: `mainClass` is still `"PacManFrame"`. | `app/build.gradle.kts` |
+| **High** | **The test passes by accident.** When the constructors changed, the `setMaze(maze)` line was dropped, so `new Maze(3, 5)` uses the hardcoded 20×20 level, not the test's 3×5 fixture. It still passes only because row 1 of the real level happens to have a wall at column 0 too. The `maze` field in the test is dead. Root cause: `Maze`'s constructor *looks* like it configures the grid but doesn't. | `PacManTest`, `Maze` |
 | High | **Data race between threads.** The game thread calls `move()` while the EDT paints and writes `queuedDirection` from `keyPressed`. No synchronization or `volatile`. | `PacManPanel` |
 | Medium | `speed` field is ignored — movement is always 1 px per tick. Using it breaks the `% size == 0` alignment check for any speed that doesn't divide the tile size. | `PacMan` |
-| Medium | No mid-tile reversal: pressing the opposite direction only takes effect at the next tile centre. (Verified: right 5 px, press left → keeps going right.) | `PacMan.move()` |
+| Medium | No mid-tile reversal: pressing the opposite direction only takes effect at the next tile centre. | `PacMan.move()` |
 | Medium | No bounds check on the maze lookup — tunnel wrap (Phase 5) will throw `ArrayIndexOutOfBoundsException`. | `PacMan.move()` |
 | Medium | Movement speed depends on loop timing (`sleep(20)` + `repaint()` in one thread). | `PacManPanel.run()` |
 | Medium | New image allocated every frame on top of Swing's own double buffering; `super.paintComponent` not called. | `PacManPanel.paintComponent()` |
-| Low | Constructor ignores its `size` argument (`this.size = 20`). Either use it or remove the parameter. | `PacMan` |
-| Low | `System.out.println` in `move()`, `paintComponent()` and `keyPressed()` (from the thread-name exercise) — fine while learning, remove before committing. | `PacMan`, `PacManPanel` |
-| Low | `Maze.getMaze()`/`setMaze()` expose the internal array; `height`/`width` are unused and gained setters. Prefer `isWall(col, row)` and a constructor that takes the grid. | `Maze` |
-| Low | Size defined three times and preferred size still passed as `(height, width)`. | several |
+| Low | `System.out.println` in `move()`, `paintComponent()` and `keyPressed()` (thread-name exercise) — remove before committing. | `PacMan`, `PacManPanel` |
+| Low | `Maze` constructor takes `height`/`width` it never uses; `getMaze()`/`setMaze()` expose the internal array. Prefer `Maze(int[][] grid)` + `isWall(col, row)`. | `Maze` |
+| Low | Size defined three times; preferred size passed as `(height, width)`. | several |
 | Low | Magic numbers `20`, `400`, `1`, `2`, `7`, `5`. | everywhere |
 | Low | Frame not created on the EDT; `setVisible(true)` before close op and background; no title. | `PacManFrame` |
-| Low | `.idea` is now in `.gitignore`, but its five files are still tracked (`git rm -r --cached .idea`). `.DS_Store` files are untracked and not ignored. | repo |
+| Low | README structure section and "corner pause" limitation out of date. | `README.md` |
 
 ---
 
@@ -109,26 +115,27 @@ into package `io.github.scott2100.pacman`, `PLAN.md` moved to `docs/`, `.idea` a
 6. **Write the failing test first** for every bug you fix. *(The corner stall got fixed without one — backfill it.)*
 7. **No toolkit migration** to solve a design problem.
 8. **Keep every commit green.** A refactor (like a package move) isn't done until `./gradlew test run` passes.
+9. **A test you've never seen fail hasn't proved anything.** After writing or changing a test, break the code (or the fixture) on purpose and watch it go red once. *(Added 2026-11-20 — the current test would have been caught this way.)*
 
 ---
 
 ## 7. Phases
 
-### Phase 0 — Foundations — *nearly done*
+### Phase 0 — Foundations — *done once the staged work is committed*
 
 - [x] git repo, first commit is the 2015 code (the "before" photo).
-- [x] `.gitignore` for `*.class`, `.gradle`, `build`.
+- [x] `.gitignore` for `*.class`, `.gradle`, `build`, `.idea`, `.DS_Store`.
 - [x] No `.class` files in the tree.
 - [x] Gradle with a committed wrapper (`./gradlew`).
 - [x] Standard layout (`app/src/main/java`, `app/src/test/java`).
-- [x] Run task: `./gradlew run` launches `PacManFrame`. *(Broken again by the package move — see below.)*
-- [x] Move `PLAN.md` into the repo (`docs/PLAN.md`). *(uncommitted)*
-- [x] Add a package declaration (`io.github.scott2100.pacman`). *(uncommitted)*
-- [x] Remove the unused `guava` entry from `libs.versions.toml`. *(uncommitted)*
-- [x] Expand `README.md`. Still to do: screenshot/GIF; refresh structure section and limitations.
-- [ ] **Finish the package move:** `mainClass.set("io.github.scott2100.pacman.PacManFrame")`; move the test to `app/src/test/java/io/github/scott2100/pacman/` with a matching `package` line; update it to the new constructors.
-- [ ] Untrack `.idea` (`git rm -r --cached .idea`) and add `.DS_Store` to `.gitignore`.
-- [ ] Commit with `git add -A` so git records the moves as renames, then merge the feature branch when green.
+- [x] Run task: `./gradlew run` launches `io.github.scott2100.pacman.PacManFrame`.
+- [x] Move `PLAN.md` into the repo (`docs/PLAN.md`).
+- [x] Add a package declaration (`io.github.scott2100.pacman`).
+- [x] Remove the unused `guava` entry from `libs.versions.toml`.
+- [x] Untrack `.idea`; ignore `.DS_Store`.
+- [~] Finish the package move — test moved and updated (staged, not committed).
+- [ ] Expand `README.md`: screenshot/GIF; refresh structure section and limitations.
+- [ ] Commit the staged + unstaged work, then merge the feature branch when green.
 
 **Acceptance:** a clean clone builds and runs with one documented command; plan and code live together.
 
@@ -139,7 +146,7 @@ into package `io.github.scott2100.pacman`, `PLAN.md` moved to `docs/`, `.idea` a
 - [x] Delete dead imports, the `keys` array and debug prints. *(prints are back temporarily for the thread exercise)*
 - [x] Fix the `PacmanFrame`/`PacManFrame` capitalization.
 - [x] Stop swallowing exceptions in `run()` and restore the interrupt flag.
-- [ ] Remove the remaining dead state: `Maze.height/width` (+ setters), `PacManPanel`'s `public static` sizes, `PacMan`'s ignored `size` argument.
+- [~] Remove the remaining dead state: `PacMan`'s ignored `size` ✅ (staged), `Maze` setters ✅ (unstaged). Still: `Maze.height/width` fields + constructor params, `PacManPanel`'s `public static` sizes.
 - [ ] Replace magic numbers with named constants (tile size, speed, tile types). *Hint: tile types are a natural second enum.*
 - [ ] Fix the swapped preferred-size arguments (better: compute size from maze dimensions × tile size).
 - [ ] Start the UI on the EDT; set title, close op and background before `setVisible(true)`.
@@ -155,9 +162,10 @@ Done:
 - [x] Four duplicated blocks deleted; `move()` is ~20 lines.
 
 2a — fix the routine:
-- [x] **Fix the corner stall.** *(Fixed; still needs its regression test — Phase 3.)*
+- [x] **Fix the corner stall.** *(Still needs its regression test — Phase 3.)*
+- [x] Inject the maze through `PacMan`'s constructor.
+- [ ] **`Maze` takes its grid in the constructor** (`new Maze(grid)`) and drops `height`/`width`/`setMaze`. The 20×20 level moves out of `Maze` into whoever creates the game (for now `PacManPanel`, later a level file). *This is the quick target — see section 10.*
 - [ ] Allow instant reversal mid-tile. *Hint: reversing is always legal because you came from that tile. Where in `move()` would the check go so it runs even when you're not on a tile centre?*
-- [~] Inject the maze through the constructor — done; now drop `setMaze`.
 - [ ] Give `Maze` a query method (`isWall(col, row)`) and stop exposing the array — this is also where bounds/wrap handling will live. *Hint: once this exists, the two long `maze.getMaze()[…][…]` expressions in `move()` collapse to one readable line each.*
 
 2b — make speed real:
@@ -165,18 +173,18 @@ Done:
 
 **Acceptance:** no stall at corners; reversal is instant; any speed works; each of these has a test.
 
-### Phase 3 — Tests — *started, currently not compiling*
+### Phase 3 — Tests — *compiles again, but the one test is hollow*
 
 - [x] JUnit 5 via Gradle.
-- [x] Moving into a wall stops on the last open tile.
-- [ ] **Get the suite compiling again** (package + constructors — see Phase 0).
+- [x] Suite compiles in the new package (staged).
+- [~] Moving into a wall stops on the last open tile — exists, but runs against the real level, not its fixture. Make it use its own maze and see it fail once (principle 9).
 - [ ] Corner turn has no stall (regression test for the 2a fix).
 - [ ] Buffered turn: queued direction is rejected into a wall and applied at the next open junction.
 - [ ] Reversal mid-tile.
 - [ ] Each of the four directions, with one parameterized test (`@ParameterizedTest` + `@EnumSource`).
 - [ ] Speed > 1 still stops exactly on tile centres.
 - [ ] Later (with Phase 5): pellet consumption → score; no pellets → win; tunnel wrap.
-- [ ] Tidy the test class: fields set in `@BeforeEach` (or local variables), not `public` fields; a tiny helper to build a maze from strings makes fixtures readable.
+- [ ] Tidy the test class: local variables or `@BeforeEach`, not `public` fields; a tiny helper to build a maze from strings (`"#...#"`) makes fixtures readable.
 
 **Acceptance:** a dozen focused tests, runnable with `./gradlew test`, none touching Swing.
 
@@ -199,7 +207,7 @@ Done:
 - [ ] Score, with a HUD.
 - [ ] Win state when no pellets remain.
 - [ ] Tunnel wrap on the left/right edges (needs the `Maze` query method from 2a).
-- [ ] Load the maze from a **text file** (resource) rather than a hardcoded array.
+- [ ] Load the maze from a **text file** (resource) rather than a hardcoded array. *(Easy once `Maze` takes its grid in the constructor.)*
 - [ ] Persist a high score.
 - [ ] *Architecture step:* introduce a `Game` (or `World`) class that owns `Maze`, `PacMan`, score and state, with an `update()` method. The panel then only reads it to draw and forwards input to it.
 
@@ -234,8 +242,9 @@ Done:
 | Build tool | **Decided: Gradle 9.8 + wrapper** | `application` plugin, `./gradlew run`. |
 | Java version | **Decided: 21 (toolchain)** | Stated in the README ✅. |
 | Test framework | **Decided: JUnit 5** | |
-| Package name | **Decided: `io.github.scott2100.pacman`** | Classes are package-private — good; tests must live in the same package. |
+| Package name | **Decided: `io.github.scott2100.pacman`** | Classes are package-private — good; tests live in the same package ✅. |
 | Plan location | **Decided: `docs/PLAN.md` in the repo** | Mirrored in the mentoring project. |
+| Maze construction | **Decided (2026-11-20): `Maze(int[][] grid)`** | The level data lives outside `Maze`; `Maze` is just rules over a grid. Makes tests and level files trivial. |
 | UI toolkit | Stay on Swing / Java2D | Unchanged. |
 | TUI version | Rejected | Unchanged. |
 | Tests | Narrow, logic-only | Unchanged. |
@@ -263,11 +272,18 @@ Done:
 
 ---
 
-## 10. Suggested next three steps
+## 10. Suggested next steps
 
-1. **Make the build green again:** fully qualified `mainClass`; move `PacManTest` into the package and update it to the new constructors; run `./gradlew test run`. Then untrack `.idea`, ignore `.DS_Store`, and commit with `git add -A` ("Move sources into io.github.scott2100.pacman; move plan to docs/").
-2. **Backfill the corner-stall regression test** (L-shaped maze, queue UP before the corner, assert y decreases on the tick after reaching it). Bonus: write the reversal test, watch it fail, then fix it.
-3. **Finish the thread exercises in section 13**, remove the debug prints, and swap the raw thread for a `javax.swing.Timer`.
+**Quick target (≈20–30 min): make the test honest, then commit green.**
+1. Change `Maze` so its constructor takes the grid: `Maze(int[][] grid)`. Delete `height`, `width` and `setMaze`.
+2. Move the 20×20 level array out of `Maze` to where the game is built (`PacManPanel` for now — e.g. a `private static final int[][] LEVEL_1`). *It's `static final` data, not mutable state, so that's fine.*
+3. Let the compiler guide you: fix each call site it flags (panel and test). The test becomes `new Maze(maze)`.
+4. Prove the test now tests something (principle 9): change the fixture so the wall is somewhere else, or change the expected value, run `./gradlew test`, watch it fail, then put it back.
+5. Remove the debug prints (or keep them out of the commit), run `./gradlew test run`, and commit everything: "Maze takes its grid; test uses its own fixture".
+
+Then:
+6. **Backfill the corner-stall regression test** (L-shaped maze, queue UP before the corner, assert y decreases on the tick after reaching it). Bonus: write the reversal test, watch it fail, then fix it.
+7. **Finish the thread exercises in section 13** and swap the raw thread for a `javax.swing.Timer`.
 
 ---
 
@@ -281,7 +297,7 @@ Done:
 - Fullscreen toggle.
 - Config file for constants.
 - A second renderer (headless text or PNG dump) as proof the model is view-independent.
-- GitHub Actions running `./gradlew test` on every push. *(Would have caught today's broken test immediately.)*
+- GitHub Actions running `./gradlew test` on every push. *(Would have flagged the red `ad9a546` commit immediately.)*
 
 ## 12. Explicitly not worth it
 
@@ -294,7 +310,7 @@ Done:
 
 ## 13. Learning track — threads and the Swing event loop
 
-**Status:** started (thread-name prints are in the code as of 2026-11-18). Finish before Phase 4.
+**Status:** started (thread-name prints are in the code). Finish before Phase 4.
 **Why:** the data race in `PacManPanel` was found by reading the code, not by playing. The goal here is to be able to spot that kind of bug yourself.
 
 ### Key ideas (from the 2026-11-18 mentoring chat)
@@ -312,7 +328,7 @@ Done:
 - [~] **See the threads.** Add `System.out.println(Thread.currentThread().getName())` to `move()`, `paintComponent()` and `keyPressed()`. Run and note which names appear where. *(prints added — record what you saw)*
 - [ ] **See the event loop.** Put a breakpoint in `keyPressed`, run in the debugger, press a key, and read the call stack down to `EventDispatchThread.pumpEvents`.
 - [ ] **Field/thread table.** For `PacMan` and `PacManPanel`, write a table: each mutable field → which threads write it → which threads read it. Mark every row with two threads.
-- [ ] **Slow-motion mode.** Temporarily set the loop to 500 ms per tick (or add a step key) and watch Pac-Man take a corner — now that the stall is fixed, use it to watch the *reversal* gap instead.
+- [ ] **Slow-motion mode.** Temporarily set the loop to 500 ms per tick (or add a step key) and watch the *reversal* gap.
 - [ ] **Swap to `Timer`.** Replace the `Thread`/`Runnable`/`sleep` with `javax.swing.Timer`, rerun the thread-name exercise, and confirm everything prints the same EDT name.
 - [ ] **Assert it stays fixed.** Add `assert SwingUtilities.isEventDispatchThread();` at the top of `move()` (run with `-ea`).
 
@@ -328,16 +344,17 @@ Done:
 
 ## Review log
 
-- **2026-11-18 (code review)** — Reviewed the working tree on `feature/testin_movement_refactor` (last commit `0898748` + uncommitted package move).
-  Done: corner stall fixed (verified by running `move()` headless), interrupt handling fixed, maze injected via constructor,
-  package added, plan moved to `docs/`, guava removed, README much improved, `.idea` ignored.
-  **Blockers:** test suite doesn't compile after the package/constructor changes; `mainClass` not fully qualified.
-  New low-severity items: `PacMan` ignores its `size` argument; `Maze` gained setters for dead fields; `.idea` still tracked;
-  `.DS_Store` not ignored. Still open: reversal, speed, bounds, data race, per-frame allocation.
+- **2026-11-20 (code review)** — Reviewed `ad9a546` + staged/unstaged changes on `feature/testin_movement_refactor`.
+  Done: `mainClass` fully qualified, test moved into the package and updated to the new constructors (staged), `PacMan` uses its
+  `size` argument (staged), `Maze` setters removed (unstaged), `.idea` untracked, `.DS_Store` ignored. Phase 0 effectively complete.
+  **New finding:** the test passes by accident — dropping `setMaze(maze)` during the constructor update left it running against
+  the hardcoded 20×20 level, and its own fixture is dead. Root cause is `Maze`'s constructor taking `height`/`width` it ignores.
+  Decided `Maze(int[][] grid)`; made it the quick target. Noted `ad9a546` was committed red. Added principle 9.
+- **2026-11-18 (code review)** — Reviewed the working tree (last commit `0898748` + uncommitted package move).
+  Done: corner stall fixed, interrupt handling fixed, maze injected via constructor, package added, plan moved to `docs/`,
+  guava removed, README much improved, `.idea` ignored. Blockers: test suite didn't compile; `mainClass` not fully qualified.
   Added principle 8 ("keep every commit green").
-- **2026-11-18** — Added section 13, a learning track on threads and the Swing event loop (notes from the mentoring chat, exercises, reading). Phase 4 now points to it.
-- **2026-11-17** — Reviewed against the code on `feature/testin_movement_refactor` (+ uncommitted changes).
-  Phase 0 mostly done; Phase 1 about half done; Phase 2 routine done, two movement bugs found (corner stall, no reversal) and `speed` unused;
-  Phase 3 started (1 test). New defects: thread data race, hidden `setMaze` dependency, exposed maze array,
-  frame not on the EDT. Added Phase 2a/2b, a suggested `Game` class in Phase 5, and next steps.
+- **2026-11-18** — Added section 13, a learning track on threads and the Swing event loop. Phase 4 now points to it.
+- **2026-11-17** — Reviewed against the code. Phase 0 mostly done; Phase 1 about half done; Phase 2 routine done, two movement
+  bugs found (corner stall, no reversal) and `speed` unused; Phase 3 started (1 test). Added Phase 2a/2b, a `Game` class in Phase 5.
 - **2026-11-08** — First version.

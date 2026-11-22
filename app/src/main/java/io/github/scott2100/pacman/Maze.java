@@ -2,9 +2,7 @@ package io.github.scott2100.pacman;
 
 class Maze {
 
-	private int height;
-	private int width;
-	private int[][] maze = {
+	private int[][] grid = {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 			{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 },
@@ -27,33 +25,7 @@ class Maze {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	};
 
-	public Maze(int height, int width) {
-		this.height = height;
-		this.width = width;
+	public Maze(int[][] grid) {
+		this.grid = grid;
 	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setMaze(int[][] maze) {
-		this.maze = maze;
-	}
-
-	public int[][] getMaze() {
-		return maze;
-	}
-
 }

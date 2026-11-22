@@ -5,22 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PacManTest {
 
-    public int[][] maze = {
+    public int[][] grid = {
             { 1, 1, 1, 1, 1 },
             { 1, 0, 0, 0, 1 },
             { 1, 1, 1, 1, 1 }
     };
 
     public PacMan pacman;
-    public Maze pacMaze;
+    public Maze maze;
 
     @Test
     public void testMovingLeftStopsWhenItHitsAWall() {
-        pacMaze = new Maze();
-        pacMaze.setMaze(maze);
-        pacman = new PacMan(60, 20);
+        maze = new Maze(grid);
+        pacman = new PacMan(60, 20, 20, maze);
         pacman.setQueuedDirection(Direction.LEFT);
-        pacman.setMaze(pacMaze);
         for (int i = 50; i > 0; i--) {
             pacman.move();
         }

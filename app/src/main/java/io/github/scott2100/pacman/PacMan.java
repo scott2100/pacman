@@ -12,7 +12,7 @@ class PacMan {
 	public PacMan(int x, int y, int size, Maze maze) {
 		this.pacmanX = x;
 		this.pacmanY = y;
-		this.size = 20;
+		this.size = size;
 		this.maze = maze;
 	}
 
@@ -57,13 +57,13 @@ class PacMan {
 
 		if (this.getPacManX() % this.getSize() == 0 && this.getPacManY() % this.getSize() == 0) {
 
-			if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY())
+			if ((this.maze.grid[getAdjustedCoordinate(this.getPacManY())
 					+ queuedDirection.getDy()][getAdjustedCoordinate(this.getPacManX())
 							+ queuedDirection.getDx()] != 1)) {
 				this.direction = this.queuedDirection;
 			}
 
-			if ((this.maze.getMaze()[getAdjustedCoordinate(this.getPacManY())
+			if ((this.maze.grid()[getAdjustedCoordinate(this.getPacManY())
 					+ direction.getDy()][getAdjustedCoordinate(this.getPacManX()) + direction.getDx()] == 1)) {
 				this.direction = Direction.STOPPED;
 			}
