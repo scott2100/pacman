@@ -8,3 +8,8 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Ignore intellij project data
+.idea
+
+.DS_Store

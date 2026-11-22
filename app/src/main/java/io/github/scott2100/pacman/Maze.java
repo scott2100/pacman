@@ -1,11 +1,8 @@
-import java.awt.*;
-import javax.swing.*;
+package io.github.scott2100.pacman;
 
 class Maze {
 
-	private static int height = 400;
-	private static int width = 400;
-	private static int[][] maze = {
+	private int[][] grid = {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 			{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
 			{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1 },
@@ -28,28 +25,7 @@ class Maze {
 			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	};
 
-	public void setHeight(int height) {
-		this.height = height;
+	public Maze(int[][] grid) {
+		this.grid = grid;
 	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setMaze(int[][] maze) {
-		this.maze = maze;
-	}
-
-	public int[][] getMaze() {
-		return maze;
-	}
-
 }
