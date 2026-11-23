@@ -36,10 +36,10 @@ class PacManPanel extends JPanel implements Runnable, KeyListener {
 	};
 
 	Maze pacMaze = new Maze(grid);
-	PacMan pacMan = new PacMan(20, 20, 20, pacMaze);
+	PacMan pacMan = new PacMan(20, 20, 20, 3, pacMaze);
 
 	public PacManPanel() {
-		this.setPreferredSize(new Dimension(height, width));
+		this.setPreferredSize(new Dimension(width, height));
 		this.setFocusable(true);
 		setDoubleBuffered(true);
 		addKeyListener(this);
