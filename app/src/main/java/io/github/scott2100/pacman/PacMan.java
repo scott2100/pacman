@@ -12,6 +12,10 @@ class PacMan {
 	public void move() {
 		System.out.println("move. " + Thread.currentThread().getName());
 
+		if(this.direction.opposite() == this.queuedDirection) {
+			this.direction = this.queuedDirection;
+		}
+
 		if (this.getPacManX() % this.getSize() == 0 && this.getPacManY() % this.getSize() == 0) {
 
 			if (!this.maze.isWall((getAdjustedCoordinate(this.getPacManY()) + queuedDirection.getDy()),
@@ -25,8 +29,8 @@ class PacMan {
 			}
 		}
 
-		this.setPacManY(this.getPacManY() + direction.getDy());
 		this.setPacManX(this.getPacManX() + direction.getDx());
+		this.setPacManY(this.getPacManY() + direction.getDy());
 	}
 
 	public PacMan(int x, int y, int size, Maze maze) {
