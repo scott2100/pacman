@@ -22,7 +22,7 @@ public class PacManTest {
     @BeforeEach
     public void setup() {
         maze = new Maze(grid);
-        pacman = new PacMan(40, 20, 20, maze);
+        pacman = new PacMan(40, 20, 20, 1, maze);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class PacManTest {
 
     @Test
     public void testMovingUpStopsWhenItHitsAWall() {
-        pacman = new PacMan(40, 40, 20, maze);
+        pacman.setPacManY(40);
         pacman.setQueuedDirection(Direction.UP);
         for (int i = 50; i > 0; i--) {
             pacman.move();
@@ -73,5 +73,19 @@ public class PacManTest {
         pacman.move();
         assertEquals(46, pacman.getPacManX());
         assertEquals(20, pacman.getPacManY());
+    }
+
+    @Test
+    public void speedThreeMovePacmanThreePixelsPerTick() {
+        pacman.setSpeed(3);
+        pacman.setQueuedDirection(Direction.RIGHT);
+
+        for (int i = 0; i < 5; i++) {
+            pacman.move();
+        }
+
+        assertEquals(55, pacman.getPacManX());
+        assertEquals(20, pacman.getPacManY());
+
     }
 }

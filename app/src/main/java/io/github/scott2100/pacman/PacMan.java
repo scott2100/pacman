@@ -3,40 +3,40 @@ package io.github.scott2100.pacman;
 class PacMan {
 	private int pacmanX;
 	private int pacmanY;
-	private int speed = 2;
-	private int size = 20;
+	private int speed;
+	private int size;
 	private Direction direction = Direction.STOPPED;
 	private Direction queuedDirection = Direction.STOPPED;
 	private Maze maze;
 
 	public void move() {
-		System.out.println("move. " + Thread.currentThread().getName());
-
-		if(this.direction.opposite() == this.queuedDirection) {
-			this.direction = this.queuedDirection;
-		}
-
-		if (this.getPacManX() % this.getSize() == 0 && this.getPacManY() % this.getSize() == 0) {
-
-			if (!this.maze.isWall((getAdjustedCoordinate(this.getPacManY()) + queuedDirection.getDy()),
-					(getAdjustedCoordinate(this.getPacManX()) + queuedDirection.getDx()))) {
+		for (int i = 0; i < this.getSpeed(); i++) {
+			if (this.direction.opposite() == this.queuedDirection) {
 				this.direction = this.queuedDirection;
 			}
 
-			if (this.maze.isWall((getAdjustedCoordinate(this.getPacManY()) + direction.getDy()),
-					(getAdjustedCoordinate(this.getPacManX()) + direction.getDx()))) {
-				this.direction = Direction.STOPPED;
-			}
-		}
+			if (this.getPacManX() % this.getSize() == 0 && this.getPacManY() % this.getSize() == 0) {
+				if (!this.maze.isWall((getAdjustedCoordinate(this.getPacManY()) + queuedDirection.getDy()),
+						(getAdjustedCoordinate(this.getPacManX()) + queuedDirection.getDx()))) {
+					this.direction = this.queuedDirection;
+				}
 
-		this.setPacManX(this.getPacManX() + direction.getDx());
-		this.setPacManY(this.getPacManY() + direction.getDy());
+				if (this.maze.isWall((getAdjustedCoordinate(this.getPacManY()) + direction.getDy()),
+						(getAdjustedCoordinate(this.getPacManX()) + direction.getDx()))) {
+					this.direction = Direction.STOPPED;
+				}
+			}
+
+			this.setPacManX(this.getPacManX() + direction.getDx());
+			this.setPacManY(this.getPacManY() + direction.getDy());
+		}
 	}
 
-	public PacMan(int x, int y, int size, Maze maze) {
+	public PacMan(int x, int y, int size, int speed, Maze maze) {
 		this.pacmanX = x;
 		this.pacmanY = y;
 		this.size = size;
+		this.speed = speed;
 		this.maze = maze;
 	}
 
